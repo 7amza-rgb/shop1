@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NeonShop — Premium E-commerce</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0a0014;color:#e2e8f0;min-height:100vh}
+    header{background:linear-gradient(90deg,#1a0033,#0a0014);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(139,92,246,0.3)}
+    h1{color:#a78bfa;font-size:22px;font-weight:800}
+    .cart-badge{background:#7c3aed;color:white;border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;border:none;font-weight:600}
+    .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;padding:32px}
+    .card{background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);border-radius:16px;overflow:hidden;transition:all 0.2s;cursor:pointer}
+    .card:hover{border-color:rgba(167,139,250,0.5);box-shadow:0 0 24px rgba(139,92,246,0.2);transform:translateY(-3px)}
+    .thumb{height:180px;display:flex;align-items:center;justify-content:center;font-size:64px;background:rgba(139,92,246,0.05)}
+    .card-body{padding:16px}
+    .price{font-size:20px;font-weight:700;color:#a78bfa}
+    .name{font-size:15px;font-weight:600;margin:6px 0}
+    .desc{font-size:12px;color:#6b7280;margin-bottom:12px}
+    .btn{width:100%;background:linear-gradient(135deg,#7c3aed,#a78bfa);border:none;color:white;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+    .btn:hover{opacity:0.85}
+    .cart-panel{position:fixed;right:0;top:0;bottom:0;width:320px;background:rgba(10,0,20,0.97);border-left:1px solid rgba(139,92,246,0.3);padding:24px;display:none;flex-direction:column;z-index:100;backdrop-filter:blur(20px)}
+    .cart-panel.open{display:flex}
+    .cart-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(139,92,246,0.15);font-size:13px}
+    .total{margin-top:auto;padding-top:16px;border-top:1px solid rgba(139,92,246,0.3);font-size:18px;font-weight:700;color:#a78bfa}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>⚡ NeonShop</h1>
+    <button class="cart-badge" onclick="toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+  </header>
+  <div class="products" id="products"></div>
+  <div class="cart-panel" id="cartPanel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h2 style="color:#a78bfa">Your Cart</h2>
+      <button onclick="toggleCart()" style="background:none;border:none;color:#6b7280;cursor:pointer;font-size:20px">✕</button>
+    </div>
+    <div id="cartItems"></div>
+    <div class="total" id="cartTotal"></div>
+    <button class="btn" style="margin-top:16px" onclick="checkout()">Checkout →</button>
+  </div>
+  <script>
+    const products=[
+      {id:1,name:'Neon Headphones',price:129,emoji:'🎧',desc:'Wireless with 40h battery'},
+      {id:2,name:'Holo Keyboard',price:89,emoji:'⌨️',desc:'RGB mechanical 60%'},
+      {id:3,name:'Quantum Mouse',price:59,emoji:'🖱️',desc:'16000 DPI wireless'},
+      {id:4,name:'Cyber Monitor',price:349,emoji:'🖥️',desc:'4K 144Hz IPS panel'},
+      {id:5,name:'Data Gloves',price:199,emoji:'🧤',desc:'Haptic feedback VR'},
+      {id:6,name:'Neural SSD',price:149,emoji:'💾',desc:'4TB NVMe 7000MB/s'},
+    ];
+    let cart={};
+    function render(){
+      document.getElementById('products').innerHTML=products.map(p=>`
+        <div class="card">
+          <div class="thumb">${p.emoji}</div>
+          <div class="card-body">
+            <div class="price">$${p.price}</div>
+            <div class="name">${p.name}</div>
+            <div class="desc">${p.desc}</div>
+            <button class="btn" onclick="addToCart(${p.id})">Add to Cart</button>
+          </div>
+        </div>`).join('');
+    }
+    function addToCart(id){
+      cart[id]=(cart[id]||0)+1;
+      updateCart();
+      document.getElementById('cartPanel').classList.add('open');
+    }
+    function updateCart(){
+      const total=Object.entries(cart).reduce((s,[id,q])=>s+products[id-1].price*q,0);
+      document.getElementById('cartCount').textContent=Object.values(cart).reduce((a,b)=>a+b,0);
+      document.getElementById('cartItems').innerHTML=Object.entries(cart).map(([id,q])=>{
+        const p=products[id-1];
+        return `<div class="cart-item"><span>${p.emoji} ${p.name} ×${q}</span><span>$${p.price*q}</span></div>`;
+      }).join('');
+      document.getElementById('cartTotal').textContent=`Total: $${total}`;
+    }
+    function toggleCart(){document.getElementById('cartPanel').classList.toggle('open')}
+    function checkout(){alert('🎉 Order placed! Total: $'+Object.entries(cart).reduce((s,[id,q])=>s+products[id-1].price*q,0));cart={};updateCart();toggleCart();}
+    render();
+  </script>
+</body>
+</html>
